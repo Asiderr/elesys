@@ -55,15 +55,20 @@ class Data:
                             self.local_max.append([max_val_x, max_val])
                             max_val = 0
 
+    def expot(self, x, a, b, c):
+            return a * np.exp(b * x) + c
+
     def regresion(self):
         x = []
-        y = [] 
+        y = []
         for i in self.local_max:
             x.append(i[0])
-            y.append(abs(i[1]-self.local_max[-1][1]))
-        x_np = np.array(x)
-        y_np = np.array(y)
-        self.result = opt.curve_fit(lambda t,a,b: (a*np.exp(b*t)), x_np, y_np, p0=(229.18399437, -32.24922187))
+            y.append(i[1])
+        x_np = np.array(x[0:4])
+        y_np = np.array(y[0:4])
+        popt, pcov = opt.curve_fit(self.expot, x_np, y_np)
+        self.result = popt
+        # self.result = opt.curve_fit(lambda t,a,b: (a*np.exp(b*t)), x_np, y_np, p0=(1, 5))
 
 
 class Plots(Data):
@@ -81,34 +86,38 @@ class Plots(Data):
         y = y[700:3200].copy()
         x = x[700:3200].copy()
         y_vol = y_vol[700:3200].copy()
-        
+        # obwiednia wykresu
         self.determination_of_local_max(self.plot2[700:3200])
         self.regresion()
-        coefficent = self.result[0]
-        print(coefficent)
-        x_exp = np.arange(self.local_max[0][0], self.local_max[-1][0], 0.001)
+        coefficent = self.result
+        x_exp = np.arange(self.local_max[0][0], (-1/coefficent[2])*4, 0.001)
         y_exp = []
         for i in x_exp:
-            y_exp.append(-1*(coefficent[0])*math.exp(coefficent[1]*i)+self.local_max[-1][1])
+            y_exp.append(coefficent[0]*math.exp(coefficent[1]*i)+coefficent[2])
         y_exp = np.array(y_exp)
-        
+        # rysowanie wykresów
         fig, ax = plt.subplots()
         par1 = ax.twinx()
         plt.grid(True)
-
         line1, = ax.plot(x, y, label="i(t)")
-        line3, = ax.plot(x_exp, y_exp, label="exp(t)")
+        line3, = ax.plot(
+            x_exp,
+            y_exp,
+            label="y(t) = " + str(round(coefficent[0], 2)) +
+            " *e" + r'$^{%.2f *t}$' % (round(coefficent[1], 2))
+            )
         line2, = par1.plot(x, y_vol, "r", label="u(t)")
         ax.set_xlabel("t [s]")
         ax.set_ylabel("I [A]")
         par1.set_ylabel("U [V]")
-        lines = [line1, line2]
+        lines = [line1, line2, line3]
         ax.legend(lines, [l.get_label() for l in lines])
         # wyznaczanie maksymalnej wartości prądu udarowego
         ymax = min(y)
         xpos = y.index(ymax)
         xmax = x[xpos]
         ax.set_ylim(-350, 350)
+        ax.set_xlim(0, 0.225)
         # rysowanie kres|
         ax.annotate(
                      '',
@@ -131,7 +140,7 @@ class Plots(Data):
                 ha='center',
                 va='center'
                 )
-        # Kreska w stylu
+        # Kreska w stylu |-|
         par1.annotate(
                      '',
                      xy=(-0.145299 + 0.15, 320+2),
@@ -153,7 +162,7 @@ class Plots(Data):
             )
         # określenie czasu początkowego
         x_tp = -0.14561 + 0.15
-        x_tk = 0.0008 + 0.15
+        x_tk = (-1/coefficent[2])*4
         x_cen = x_tp + (x_tk-x_tp)/2
         y_t = - 320
         par1.set_ylim(-350, 350)
@@ -173,8 +182,27 @@ class Plots(Data):
                 ha='center',
                 va='center'
                       )
-        plt.show()
+        # stała czasowa
+        par1.annotate(
+                     '',
+                     xy=(self.local_max[0][0], -200),
+                     xytext=((self.local_max[0][0]-1/coefficent[2]), -200),
+                     arrowprops=dict(
+                                        facecolor='black',
+                                        arrowstyle='|-|, widthB=0.4,widthA=0.4',
+                                    ),
+                     horizontalalignment='right'
+                    )
+        tcen = self.local_max[0][0] + (-1/coefficent[2])/2
+        par1.annotate(
+                r"$T_{0} $"+"="+str(round((-1/coefficent[2]), 3))+'s',
+                xy=(tcen, -200+6),
+                ha='center',
+                va='center'
+                      )
 
+        plt.show()
+        
 
 c = Plots()
 c.reciving_data()
