@@ -15,16 +15,16 @@ class Data:
         self.plot3 = []
         self.plot4 = []
         plots_together = []
-        with open('1_wspolny.csv', 'r') as csvfile:
+        with open('3_Norbert.csv', 'r') as csvfile:
             plots = csv.reader(csvfile, delimiter=',')
             for row in plots:
                 temp = [sample for sample in row if sample is not '']
                 # plot 1,2 - prąd
                 # plot 3,4 - napięcie
-                self.plot1.append([float(temp[0]) + 0.15, float(temp[1])*(496.52/5)])
-                self.plot2.append([float(temp[2]) + 0.15, float(temp[3])*(496.52/5)])
-                self.plot3.append([float(temp[4]) + 0.15, float(temp[5])*(71.47)])
-                self.plot4.append([float(temp[6]) + 0.15, float(temp[7])*(71.47)])
+                self.plot1.append([float(temp[0]) + 0.155, float(temp[1])*(496.52/5)])
+                self.plot2.append([float(temp[2]) + 0.155, float(temp[3])*(496.52/5)])
+                self.plot3.append([float(temp[4]) + 0.155, float(temp[5])*(71.47)])
+                self.plot4.append([float(temp[6]) + 0.155, float(temp[7])*(71.47)])
 
     def determination_of_local_max(self, sample_list):
         self.local_max = []
@@ -83,11 +83,11 @@ class Plots(Data):
         # plot 4 napiecie
         for samples in self.plot4:
             y_vol.append(samples[1])
-        y = y[700:3200].copy()
-        x = x[700:3200].copy()
-        y_vol = y_vol[700:3200].copy()
+        y = y[600:3200].copy()
+        x = x[600:3200].copy()
+        y_vol = y_vol[600:3200].copy()
         # obwiednia wykresu
-        self.determination_of_local_max(self.plot2[700:3200])
+        self.determination_of_local_max(self.plot2[600:3200])
         self.regresion()
         coefficent = self.result
         x_exp = np.arange(self.local_max[0][0], (-1/coefficent[2])*4, 0.001)
@@ -117,7 +117,6 @@ class Plots(Data):
         xpos = y.index(ymax)
         xmax = x[xpos]
         ax.set_ylim(-350, 350)
-        ax.set_xlim(-0.01, 0.225)
         # rysowanie kres|
         ax.annotate(
                      '',
@@ -132,19 +131,21 @@ class Plots(Data):
                      horizontalalignment='right'
                     )
         # jeśli tekst wysuwa się za oś zmień mianownik
-        xcenter = xmax-(abs(x[0])+abs(x[len(x)-1]))/22
+        xcenter = xmax-(abs(x[0])+abs(x[len(x)-1]))/25
         # dodawanie tekstu nad kreską
         ax.annotate(
-                r'$I_{udar}$' + '= '+str(round(abs(ymax), 3))+'A',
+                r'$I_{udar}$' + '= '+str(round(abs(ymax), 1))+'A',
                 xy=(xcenter, ymax+(250/40)),
                 ha='center',
                 va='center'
                 )
         # Kreska w stylu |-|
+        phi_p = 0.0027433
+        phi_k = 0.0190477
         par1.annotate(
                      '',
-                     xy=(-0.145299 + 0.15, 320+2),
-                     xytext=(-0.1293 + 0.15, 320+2),
+                     xy=(phi_p, 320+2),
+                     xytext=(phi_k, 320+2),
                      arrowprops=dict(
                                         facecolor='black',
                                         arrowstyle='|-|, widthB=0.4,widthA=0.4',
@@ -152,8 +153,8 @@ class Plots(Data):
                      horizontalalignment='right'
                     )
         # 0.15 - przesunięcie do zera
-        xcenter = -0.145299 + 0.15 + (0.145299 - 0.1293)/2
-        fi = 360 - (0.145299 - 0.1293)/0.02*360
+        xcenter = phi_p + (phi_k - phi_p)/2
+        fi = 360 - (phi_k - phi_p)/0.02*360
         par1.annotate(
             r"$\phi_{pocz} $"+"="+str(round(fi, 3))+r"$^\circ$",
             xy=(xcenter, 320+10),
@@ -166,6 +167,7 @@ class Plots(Data):
         x_cen = x_tp + (x_tk-x_tp)/2
         y_t = - 320
         par1.set_ylim(-350, 350)
+        par1.set_xlim(-0.01, 0.225)
         par1.annotate(
                      '',
                      xy=(x_tp, y_t),
