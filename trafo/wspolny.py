@@ -43,7 +43,7 @@ class Data:
                     if sample[1] < 0:
                         max_val = -1 * abs_sample_val
                 # sprawdzenie kolejnego przedziału i przypisanie maximum/minimum
-                # (te 7 będą do zmiany przy następnych)
+                # (te 7 będą do zmiany przy następnych labkach)
                 if abs_sample_val < 7 and abs(sample_before[1]) > 7:
                     if first_local:
                         self.local_max.append([max_val_x, max_val])
@@ -122,7 +122,7 @@ class Plots(Data):
         ax.annotate(
                      '',
                      xy=(xmax, ymax),
-                     # jeśli jest zadługa kreska zmień mianownik w xytext
+                     # jeśli jest zadługa kreska - zmiana mianownika w xytext
                      xytext=(xmax-((abs(x[0])+abs(x[len(x)-1]))/13), ymax),
                      arrowprops=dict(
                                         facecolor='black',
@@ -131,7 +131,7 @@ class Plots(Data):
                                     ),
                      horizontalalignment='right'
                     )
-        # jeśli tekst wysuwa się za oś zmień mianownik
+        # jeśli tekst wysuwa się za oś zmiana mianownika
         xcenter = xmax-(abs(x[0])+abs(x[len(x)-1]))/22
         # dodawanie tekstu nad kreską
         ax.annotate(
@@ -151,7 +151,8 @@ class Plots(Data):
                                     ),
                      horizontalalignment='right'
                     )
-        # 0.15 - przesunięcie do zera
+        # 0.15 - przesunięcie danych do zera
+        # faza napięcia w chwili załączenia
         xcenter = -0.145299 + 0.15 + (0.145299 - 0.1293)/2
         fi = 360 - (0.145299 - 0.1293)/0.02*360
         par1.annotate(
@@ -202,7 +203,7 @@ class Plots(Data):
                       )
 
         plt.show()
-        
+
 
 c = Plots()
 c.reciving_data()
