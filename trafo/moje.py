@@ -68,6 +68,7 @@ class Data:
         y_np = np.array(y[0:4])
         popt, pcov = opt.curve_fit(self.expot, x_np, y_np)
         self.result = popt
+        # druga wersja wyznaczania krzywej expotencjalnej
         # self.result = opt.curve_fit(lambda t,a,b: (a*np.exp(b*t)), x_np, y_np, p0=(1, 5))
 
 
@@ -121,7 +122,7 @@ class Plots(Data):
         ax.annotate(
                      '',
                      xy=(xmax, ymax),
-                     # jeśli jest zadługa kreska zmień mianownik w xytext
+                     # jeśli jest zadługa kreska - zmiana mianownik w xytext
                      xytext=(xmax-((abs(x[0])+abs(x[len(x)-1]))/13), ymax),
                      arrowprops=dict(
                                         facecolor='black',
@@ -130,7 +131,7 @@ class Plots(Data):
                                     ),
                      horizontalalignment='right'
                     )
-        # jeśli tekst wysuwa się za oś zmień mianownik
+        # jeśli tekst wysuwa się za oś - zmiana mianownika
         xcenter = xmax-(abs(x[0])+abs(x[len(x)-1]))/25
         # dodawanie tekstu nad kreską
         ax.annotate(
