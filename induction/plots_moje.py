@@ -8,8 +8,8 @@ import math
 class Plots(data_analysis.Data):
     def plot_stator_current(self):
         # wczytanie odpowiednich zakresów danych
-        y_current_stator = self.current_stator[400:2500].copy()
-        x_time = self.time[400:2500].copy()
+        y_current_stator = self.current_stator[200:2500].copy()
+        x_time = self.time[200:2500].copy()
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
@@ -78,8 +78,8 @@ class Plots(data_analysis.Data):
         plt.show()
 
     def plot_stator_voltage(self):
-        y_voltage_stator = self.voltage_stator[400:2500].copy()
-        x_time = self.time[400:2500].copy()
+        y_voltage_stator = self.voltage_stator[200:2500].copy()
+        x_time = self.time[200:2500].copy()
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
@@ -94,8 +94,8 @@ class Plots(data_analysis.Data):
         plt.show()
 
     def plot_rotor_current(self):
-        y_current_rotor = self.current_rotor[400:2500].copy()
-        x_time = self.time[400:2500].copy()
+        y_current_rotor = self.current_rotor[200:2500].copy()
+        x_time = self.time[200:2500].copy()
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
@@ -144,8 +144,8 @@ class Plots(data_analysis.Data):
         plt.show()
 
     def plot_RPM(self):
-        y_tachometer = self.tachometer[400:2500].copy()
-        x_time = self.time[400:2500].copy()
+        y_tachometer = self.tachometer[200:2500].copy()
+        x_time = self.time[200:2500].copy()
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
@@ -183,8 +183,8 @@ class Plots(data_analysis.Data):
         plt.show()
 
     def plot_freq_rotor_cur(self):
-        x_time = self.time[400:2500].copy()
-        y_freq = self.freq[400:2500].copy()
+        x_time = self.time[200:2500].copy()
+        y_freq = self.freq[200:2500].copy()
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
@@ -201,14 +201,11 @@ class Plots(data_analysis.Data):
     def plot_wybieg(self):
         # wczytanie odpowiednich zakresów danych
         self.reciving_data("wybieg.csv")
-        x_time = self.time.copy()
-        y_tachometer = self.tachometer.copy()
-
-        fig, ax = plt.subplots()
-        ax.plot(x_time, y_tachometer)
-        plt.grid(True)
-        plt.show()
-        self.reciving_data("wybieg.csv")
+        x_time = self.time[72000:].copy()
+        y_tachometer = self.tachometer[72000:].copy()
+        time_const = x_time[0]
+        x_time = [x-time_const for x in x_time]
+        
         fig, ax = plt.subplots()
         plt.grid(True)
         line1, = ax.plot(x_time, y_tachometer, label="n(t)", color="cadetblue")
@@ -217,4 +214,24 @@ class Plots(data_analysis.Data):
         ax.set_ylabel("n [obr/min]")
         lines = [line1, ]
         ax.legend(lines, [l.get_label() for l in lines])
+        x_tp = 6.76
+        x_tk = 32.25
+        x_cen = x_tp + (x_tk-x_tp)/2
+        y_t = 1000
+        ax.annotate(
+                     '',
+                     xy=(x_tp, y_t),
+                     xytext=(x_tk, y_t),
+                     arrowprops=dict(
+                                        facecolor='black',
+                                        arrowstyle='|-|, widthB=0.4,widthA=0.4',
+                                    ),
+                     horizontalalignment='right'
+                    )
+        ax.annotate(
+                r"$t_{wybiegu} $"+"="+str(round((x_tk-x_tp), 3))+'s',
+                xy=(x_cen, y_t+30),
+                ha='center',
+                va='center'
+                      )
         plt.show()
