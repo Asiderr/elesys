@@ -18,13 +18,19 @@ class Plots(data_analysis.Data):
         # określenie stałej czasowej wykresu
         sample_list = [[x_time[i], y] for i, y in enumerate(y_current_armature)]
         self.determination_of_local_max(sample_list)
-        self.regresion(self.plus_local_max, 7)
-        coefficent_plus = self.result
-        x_exp_plus = np.arange(self.plus_local_max[0][0], (-1/coefficent_plus[1])*6, 0.001)
-        y_exp_plus = np.array([coefficent_plus[0]*math.exp(coefficent_plus[1]*i)+coefficent_plus[2] for i in x_exp_plus])
+        self.regresion(self.plus_local_max, 6)
+        coefficent_plus_start = self.result
+        x_exp_plus_start = np.arange(self.plus_local_max[0][0], self.plus_local_max[1][0], 0.001)
+        y_exp_plus_start = np.array([coefficent_plus_start[0]*math.exp(coefficent_plus_start[1]*i)+coefficent_plus_start[2]-3 for i in x_exp_plus_start])
+        self.regresion(self.plus_local_max[1:], 1000)
+        coefficent_plus_end = self.result
+        x_exp_plus_end = np.arange(self.plus_local_max[1][0], (-1/coefficent_plus_end[1])*9, 0.001)
+        y_exp_plus_end = np.array([coefficent_plus_end[0]*math.exp(coefficent_plus_end[1]*i)+coefficent_plus_end[2] for i in x_exp_plus_end])
+        x_exp_plus = np.append(x_exp_plus_start, x_exp_plus_end)
+        y_exp_plus = np.append(y_exp_plus_start, y_exp_plus_end)
         self.regresion(self.minus_local_max[1:], 1000)
         coefficent_minus = self.result
-        x_exp_minus = np.arange(self.minus_local_max[1][0], (-1/coefficent_minus[1])*4, 0.001)
+        x_exp_minus = np.arange(self.minus_local_max[1][0], (-1/coefficent_minus[1])*7, 0.001)
         y_exp_minus = np.array([coefficent_minus[0]*math.exp(coefficent_minus[1]*i)+coefficent_minus[2] for i in x_exp_minus])
         self.coef = coefficent_minus[1]
         
@@ -40,8 +46,8 @@ class Plots(data_analysis.Data):
         line3, = ax.plot(
             x_exp_plus,
             y_exp_plus,
-            label="y(t) = " + str(round(coefficent_plus[0], 2)) +
-            " *e" + r'$^{%.2f *t}$' % (round(coefficent_plus[1], 2))
+            label="y(t) = " + str(round(coefficent_plus_end[0], 2)) +
+            " *e" + r'$^{%.2f *t}$' % (round(coefficent_plus_end[1], 2))
             )
         ax.set_title('Prąd Twornika')
         ax.set_xlabel("t [s]")
@@ -242,7 +248,7 @@ class Plots(data_analysis.Data):
         line1, = ax.plot(x_time, y_exciting_current, label="I(t)", color='darkslategrey')
         ax.set_title('Prąd wzbudzenia')
         ax.set_xlabel("t [s]")
-        ax.set_ylabel("I [V]")
+        ax.set_ylabel("I [A]")
         lines = [line1, ]
         ax.legend(lines, [l.get_label() for l in lines])
         # wyznaczanie maksymalnej wartości prądu maksymalnego

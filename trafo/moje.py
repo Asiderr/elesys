@@ -188,8 +188,8 @@ class Plots(Data):
         # stała czasowa
         par1.annotate(
                      '',
-                     xy=(self.local_max[0][0], -200),
-                     xytext=((self.local_max[0][0]-1/coefficent[2]), -200),
+                     xy=(self.local_max[0][0], -200-35),
+                     xytext=((self.local_max[0][0]-1/coefficent[2]), -200-35),
                      arrowprops=dict(
                                         facecolor='black',
                                         arrowstyle='|-|, widthB=0.4,widthA=0.4',
@@ -199,7 +199,7 @@ class Plots(Data):
         tcen = self.local_max[0][0] + (-1/coefficent[2])/2
         par1.annotate(
                 r"$T_{0} $"+"="+str(round((-1/coefficent[2]), 3))+'s',
-                xy=(tcen, -200+6),
+                xy=(tcen+0.00225, -200+6-35),
                 ha='center',
                 va='center'
                       )
