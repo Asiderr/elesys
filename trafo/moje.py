@@ -77,16 +77,35 @@ class Plots(Data):
         x = []
         y = []
         y_vol = []
+        csvdata = []
+        wolt = []
         # plot 2 prad
         for samples in self.plot2:
             x.append(samples[0])
-            y.append(samples[1])
+            y.append(-samples[1])
         # plot 4 napiecie
         for samples in self.plot4:
             y_vol.append(samples[1])
         y = y[600:3200].copy()
         x = x[600:3200].copy()
         y_vol = y_vol[600:3200].copy()
+        
+        for i, v in enumerate(y_vol):
+            wolt.append([v, x[i]])
+
+        with open('wolt.csv', 'w') as csvFile1:
+            writer = csv.writer(csvFile1)
+            writer.writerows(wolt)
+        csvFile1.close()
+        
+        for i, v in enumerate(y):
+            csvdata.append([v, x[i]])
+
+        with open('trafo.csv', 'w') as csvFile:
+            writer = csv.writer(csvFile)
+            writer.writerows(csvdata)
+        csvFile.close()
+
         # obwiednia wykresu
         self.determination_of_local_max(self.plot2[600:3200])
         self.regresion()
