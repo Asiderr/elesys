@@ -15,18 +15,28 @@ class Plots(data_analysis.Data):
         time_const = x_time[0]
         x_time = [x-time_const for x in x_time]
 
-        # określenie stałej czasowej wykresu
-        nr = 600
-        self.regresion([
-            [[max(y_current_armature), x_time[y_current_armature.index(max(y_current_armature))]],
-             [y_current_armature[int(nr/2)], x_time[int(nr/2)]],
-             [y_current_armature[nr], x_time[nr]],]
-        ])
+        # wyrysowanie stycznej do wykresu
+        nr = 1600
+        max_index = y_current_armature.index(max(y_current_armature))
+        y1 = max(y_current_armature)
+        x1 = x_time[max_index]
+        y2 = y_current_armature[int(nr/2)]
+        x2 = x_time[int(nr/2)]
+        coef_a = (y1 - y2)/(x1 - x2)
+        coef_b = y1 - x1*coef_a
+        zero = (20-coef_b)/coef_a
+        sample = x_time.index(round(zero, 3))
+        
+        # wyliczenie stałej czasowej
+        time_const = - x_time[max_index] + x_time[sample]
+        const_line = [coef_a*t + coef_b for t in x_time[max_index:sample]]
         self.time_constatant_electrical(y_current_armature)
+        
         fig, ax = plt.subplots()
         plt.grid(True)
         line1, = ax.plot(x_time, y_current_armature, label=r"$I_{a}(t)$")
-        line2, = ax.plot(x_time, [self.result[0]*x+self.result[1] for x in self.time], label=r"$timeconst$")
+        line2, = ax.plot(x_time[max_index:sample], const_line, label=r"$timeconst$")
+        line3, = ax.plot(x_time, [20.09 for i in x_time])
         ax.set_title('Prąd Twornika')
         ax.set_xlabel("t [s]")
         ax.set_ylabel("I [A]")
@@ -48,7 +58,7 @@ class Plots(data_analysis.Data):
                      '',
                      xy=(xmax, ymax),
                      # jeśli jest zadługa kreska - zmiana mianownik w xytext
-                     xytext=(xmax-((abs(x_time[0])+abs(x_time[len(x_time)-1]))/13), ymax),
+                     xytext=(xmax-((abs(x_time[0])+abs(x_time[len(x_time)-1]))/15), ymax),
                      arrowprops=dict(
                                         facecolor='black',
                                         arrowstyle='-',
@@ -57,18 +67,20 @@ class Plots(data_analysis.Data):
                      horizontalalignment='right'
                     )
         # jeśli tekst wysuwa się za oś - zmiana mianownika def plot(self):
-        xcenter = xmax-(abs(x_time[0])+abs(x_time[len(x_time)-1]))/30
+        xcenter = xmax-(abs(x_time[0])+abs(x_time[len(x_time)-1]))/10
         # dodawanie tekstu nad kreską
         ax.annotate(
                 r'$I_{a}$' + '= '+str(round(abs(ymax), 1))+'A',
-                xy=(xcenter-0.005, ymax+5),
+                xy=(xcenter+0.2, ymax+0.5),
                 ha='center',
                 va='center'
                 )
 
         # wyznaczenie stabilnej wartości prądu
-        ymax = 0.5
-        xmax = 0.3529
+        stable = 5500
+        ymax = y_current_armature[stable]
+        xmax = x_time[stable]
+        print(xmax)
         ax.annotate(
                      '',
                      xy=(xmax, ymax+1),
@@ -85,18 +97,17 @@ class Plots(data_analysis.Data):
         xcenter = xmax+(abs(x_time[0])+abs(x_time[len(x_time)-1]))/30
         # dodawanie tekstu nad kreską
         ax.annotate(
-                r'$I_{ustalone}$' + '= '+str(round(abs(ymax), 2))+'A',
-                xy=(xcenter+0.005, ymax+5),
+                r'$I_{ustalone}$' + '= '+str(round(abs(ymax), 2))+' A',
+                xy=(xcenter+0.05, ymax+2),
                 ha='center',
                 va='center'
                 )
 
-        # określenie czasu początkowego
-        x_tp = self.zero_time
-        # do zmiany
-        x_tk = x_tp + 1
+        # określenie stałej czasowej elektromechanicznej
+        x_tp = x_time[max_index]
+        x_tk = zero
         x_cen = x_tp + (x_tk-x_tp)/2
-        y_t = -80
+        y_t = 18
         ax.annotate(
                      '',
                      xy=(x_tp, y_t),
@@ -107,10 +118,32 @@ class Plots(data_analysis.Data):
                                     ),
                      horizontalalignment='right'
                     )
-        # do zmiany
         ax.annotate(
-                r"$t_{rozruchu} $"+"="+str(round((1*4), 3))+'s',
-                xy=(x_cen, y_t+10),
+                r"$\tau_{elektromechaniczna} $"+"= "+str(round((x_tk-x_tp), 2))+' s',
+                xy=(x_cen, y_t+1),
+                ha='center',
+                va='center'
+                      )
+
+        # określenie czasu rozruchu
+        x_tp = x_time[max_index]
+        x_tk = x_tp + time_const*4
+        x_cen = x_tp + (x_tk-x_tp)/2
+        y_t = 15
+        ax.annotate(
+                     '',
+                     xy=(x_tp, y_t),
+                     xytext=(x_tk, y_t),
+                     arrowprops=dict(
+                                        facecolor='black',
+                                        arrowstyle='|-|, widthB=0.4,widthA=0.4',
+                                    ),
+                     horizontalalignment='right'
+                    )
+        
+        ax.annotate(
+                r"$t_{rozruchu} $"+"= "+str(round((time_const*4), 2))+' s',
+                xy=(x_cen, y_t+1),
                 ha='center',
                 va='center'
                       )
